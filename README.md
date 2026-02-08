@@ -124,17 +124,17 @@ function OnboardButton() {
 
 This project qualifies for:
 
-### Yellow Network ($15K)
+### Yellow Network 
 - ✅ Integrates Yellow SDK for state channels
 - ✅ Demonstrates gasless transactions
 - ✅ Shows session-based spending
 
-### Arc ($2.5K)
+### Arc 
 - ✅ Uses Arc for USDC settlement
 - ✅ Chain abstraction for liquidity
 - ✅ Global payout system (trial funding)
 
-### ENS ($3.5K)
+### ENS 
 - ✅ Creative use: user.glide.eth naming
 - ✅ Protocol reputation via ENS
 - ✅ Text records for preferences
@@ -158,17 +158,6 @@ This project qualifies for:
 - **Settlement**: Arc blockchain
 - **Naming**: ENS
 - **Monorepo**: Turborepo
-
-## 📝 Development Roadmap
-
-- [x] Project setup and architecture
-- [x] SDK core implementation
-- [x] Demo app with swap interface
-- [ ] Yellow SDK integration (real testnet)
-- [ ] Arc settlement contracts
-- [ ] ENS name registration
-- [ ] Analytics dashboard
-- [ ] Demo video production
 
 ## 🎥 Demo
 
