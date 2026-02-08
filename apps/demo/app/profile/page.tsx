@@ -2,7 +2,7 @@
 
 import { useGlide, ENSService } from '@glide/sdk';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User, twitter, FileText, Camera, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, User, Twitter, FileText, Camera, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function ProfilePage() {
