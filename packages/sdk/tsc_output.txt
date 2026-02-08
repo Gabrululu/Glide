@@ -1,0 +1,1 @@
+src/hooks/useGlide.ts(224,1): error TS1005: '}' expected.
