@@ -254,7 +254,7 @@ export default function SwapInterface() {
 
                 <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: '12px' }}>
                     <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-                        💡 <strong>Powered by Yellow Network</strong> - All swaps during your trial are processed off-chain via state channels. Zero gas, instant execution.
+                        💡 <strong>Powered by Uniswap v4</strong> - Access cutting-edge liquidity pools with advanced Hooks for optimal trading.
                     </p>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 # GLIDE SDK
 
-Plug-and-play onboarding SDK for DeFi protocols. Reduce drop-off from 50% to 25% with gasless trials powered by Yellow Network.
+Agentic Finance SDK for DeFi. Reduce drop-off from 50% to 25% with AI agents that simplify DeFi complexity.
 
 ## Installation
 
@@ -18,9 +18,8 @@ function App() {
     <GlideProvider
       config={{
         privyAppId: 'your_privy_app_id',
-        yellowApiKey: 'your_yellow_api_key',
         trialDays: 7,
-        trialAmount: '0.1', // USDC
+        trialAmount: '1000', // USDC
       }}
     >
       <YourDeFiApp />
@@ -42,7 +41,7 @@ function OnboardButton() {
 ## Features
 
 - 🚀 **Instant Onboarding**: Email login, no seed phrases
-- ⚡ **Gasless Trials**: 7-day free trial with Yellow state channels
+- 🤖 **AI Agents**: Automated yield optimization on Uniswap v4
 - 💰 **USDC Settlement**: Secure on-chain finalization via Arc
 - 🎯 **ENS Integration**: Human-readable names for users
 

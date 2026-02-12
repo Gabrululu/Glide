@@ -32,13 +32,12 @@ export class ArcService {
     }> = new Map();
 
     /**
-     * Settle a Yellow session on Arc blockchain
+     * Settle a session on Arc blockchain
      * 
      * Flow:
-     * 1. Close Yellow state channel
-     * 2. Calculate final balances
-     * 3. Submit settlement transaction to Arc
-     * 4. Transfer USDC to user's wallet
+     * 1. Calculate final balances
+     * 2. Submit settlement transaction to Arc
+     * 3. Transfer USDC to user's wallet
      */
     static async settleSession(
         walletClient: WalletClient,

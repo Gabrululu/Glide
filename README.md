@@ -38,7 +38,7 @@ glide/
 │       │   ├── GlideProvider.tsx
 │       │   ├── hooks/useGlide.ts
 │       │   └── services/
-│       │       ├── YellowService.ts
+│       │       ├── UniswapService.ts
 │       │       ├── ArcService.ts
 │       │       └── ENSService.ts
 │       └── package.json
@@ -72,7 +72,6 @@ cp .env.example apps/demo/.env.local
 
 Add your API keys:
 - **Privy App ID**: Get from [privy.io](https://privy.io)
-- **Yellow API Key**: Get from [yellow.org](https://yellow.org)
 
 ### 3. Run Development Server
 
@@ -100,9 +99,8 @@ function App() {
     <GlideProvider
       config={{
         privyAppId: 'your_privy_app_id',
-        yellowApiKey: 'your_yellow_api_key',
         trialDays: 7,
-        trialAmount: '0.1',
+        trialAmount: '1000',
       }}
     >
       <YourDeFiApp />
@@ -120,27 +118,6 @@ function OnboardButton() {
   );
 }
 ```
-
-## 🏆 Hackathon Bounties
-
-This project qualifies for:
-
-### Uniswap v4 - Agentic Finance ($5,000)
-- ✅ Agent-driven financial systems on Uniswap v4
-- ✅ Programmatic pool interaction and liquidity management
-- ✅ Transparent, reliable agent behavior
-- ✅ Composable onchain state management
-
-### Arc 
-- ✅ Uses Arc for USDC settlement
-- ✅ Chain abstraction for liquidity
-- ✅ Global payout system
-
-### ENS 
-- ✅ Creative use: user.glide.eth naming
-- ✅ Protocol reputation via ENS
-- ✅ Text records for user preferences
-
 ## 💰 Business Model
 
 **Pay-per-conversion**: Protocols pay $0.50 per successfully onboarded user
@@ -161,10 +138,6 @@ This project qualifies for:
 - **Settlement**: Arc blockchain
 - **Naming**: ENS
 - **Monorepo**: Turborepo
-
-## 🎥 Demo
-
-[Demo video will be added here]
 
 ## 📄 License
 

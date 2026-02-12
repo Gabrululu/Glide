@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useGlide, ENSService, YellowService, GlideTransaction } from '@glide/sdk';
+import { useGlide, ENSService, GlideTransaction } from '@glide/sdk';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Wallet, TrendingUp, Clock, Zap, ExternalLink, User, CheckCircle, Smartphone } from 'lucide-react';
 import TrialBanner from '@/components/TrialBanner';
@@ -28,20 +28,9 @@ export default function Dashboard() {
             const name = await ENSService.getGlideName(session.walletAddress);
             setEnsName(name);
 
-            // Fetch Recent Transactions (Yellow)
-            // Fetch Recent Transactions (Yellow)
-            const txs = await YellowService.getTransactionHistory(session.sessionId);
-            // Map Yellow txs to Glide txs for display
-            const glideTxs: GlideTransaction[] = txs.map(tx => ({
-                id: tx.id,
-                type: tx.type as any,
-                amount: tx.amount,
-                token: tx.token,
-                timestamp: tx.timestamp,
-                status: 'completed',
-                gasless: true
-            }));
-            setTransactions(glideTxs);
+            // Transactions are now managed locally
+            // In production: Would fetch from blockchain or indexer
+            setTransactions([]);
         };
 
         fetchData();
@@ -75,6 +64,13 @@ export default function Dashboard() {
                     GLIDE
                 </h1>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+
+                    <button
+                        onClick={() => router.push('/agent')}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                        🤖 AI Agent
+                    </button>
 
                     <button
                         onClick={() => router.push('/analytics')}
@@ -252,8 +248,8 @@ export default function Dashboard() {
                     title="How It Works"
                     icon={<Clock size={20} />}
                     items={[
-                        'All transactions are processed off-chain via Yellow Network',
-                        'You pay zero gas fees for 7 days',
+                        'AI agent analyzes Uniswap v4 pools for best yields',
+                        'Simplified interface - no complex DeFi jargon',
                         'Final balance settles on Arc blockchain',
                         'Continue using GLIDE or withdraw anytime',
                     ]}
@@ -262,7 +258,7 @@ export default function Dashboard() {
                     title="Powered By"
                     icon={<Zap size={20} />}
                     items={[
-                        '⚡ Yellow Network - State channels for gasless txs',
+                        '🦄 Uniswap v4 - Advanced liquidity pools with Hooks',
                         '🔷 Arc - USDC settlement layer',
                         '🔐 Privy - Embedded wallet (no seed phrases)',
                         '🌐 ENS - Decentralized identity',

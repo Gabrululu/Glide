@@ -1,6 +1,5 @@
 export interface GlideConfig {
     privyAppId: string;
-    yellowApiKey: string;
     trialDays?: number;
     trialAmount?: string; // in USDC
     arcRpcUrl?: string;
@@ -20,18 +19,12 @@ export interface GlideSession {
 
 export interface GlideTransaction {
     id: string;
-    type: 'swap' | 'transfer' | 'stake';
+    type: 'swap' | 'transfer' | 'stake' | 'invest';
     amount: string;
     token: string;
     timestamp: Date;
     status: 'pending' | 'completed' | 'failed';
     gasless: boolean;
-}
-
-export interface YellowSessionConfig {
-    sessionId: string;
-    duration: number; // in days
-    allowance: string; // max spending in USDC
 }
 
 export interface ENSProfile {
@@ -46,3 +39,4 @@ export interface ENSProfile {
     };
     trustScore?: number;
 }
+

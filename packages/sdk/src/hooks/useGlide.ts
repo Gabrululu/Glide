@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { usePrivy, useCreateWallet, useWallets } from '@privy-io/react-auth';
 import { createWalletClient, custom } from 'viem';
 import { useGlideContext } from '../GlideProvider';
-import { YellowService } from '../services/YellowService';
 import { ArcService } from '../services/ArcService';
 import { ENSService } from '../services/ENSService';
 import type { GlideSession, GlideTransaction, ENSProfile } from '../types';
@@ -26,7 +25,6 @@ export function useGlide(): any {
     }, [user?.wallet?.address]);
 
     // Helper to get viem wallet client
-    // Helper to get viem wallet client
     const getWalletClient = async () => {
         const userWalletAddress = user?.wallet?.address;
         if (!userWalletAddress) throw new Error('No user wallet address');
@@ -35,7 +33,6 @@ export function useGlide(): any {
         const wallet = wallets.find((w) => w.address.toLowerCase() === userWalletAddress.toLowerCase());
 
         if (!wallet) {
-            // Fallback: If no matching wallet found in list yet (race condition), wait or throw
             console.warn('[Glide] Wallet not found in useWallets list yet', wallets);
             throw new Error('Wallet not initializing, please try again');
         }
@@ -47,7 +44,6 @@ export function useGlide(): any {
                 await wallet.switchChain(84532);
             } catch (e) {
                 console.error('[Glide] Failed to switch chain', e);
-                // Continue anyway, might be already on correct chain or wallet ignores request
             }
         }
 
@@ -67,7 +63,7 @@ export function useGlide(): any {
 
     /**
      * Create a new Glide session for the user
-     * This should only be called when user is already authenticated
+     * Simplified: No more Yellow state channels, just local session management
      */
     const createSession = async (): Promise<GlideSession> => {
         try {
@@ -76,32 +72,23 @@ export function useGlide(): any {
                 throw new Error('Please log in first');
             }
 
-            const walletClient = await getWalletClient();
             const walletAddress = user.wallet.address;
 
-            // Create Yellow session (User signs message here)
-            const yellowSession = await YellowService.createSession(
-                walletClient,
-                walletAddress,
-                {
-                    duration: config.trialDays || 7,
-                    allowance: config.trialAmount || '0.1',
-                }
-            );
-
-            // Create Glide session
+            // Create Glide session (simplified - no Yellow)
             const trialStartDate = new Date();
             const trialEndDate = new Date();
             trialEndDate.setDate(trialEndDate.getDate() + (config.trialDays || 7));
 
+            const sessionId = `glide_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
             const newSession: GlideSession = {
                 userId: user.id,
                 walletAddress,
-                sessionId: yellowSession.sessionId,
+                sessionId,
                 trialStartDate,
                 trialEndDate,
                 isActive: true,
-                balance: config.trialAmount || '0.1',
+                balance: config.trialAmount || '100.00',
                 gasSaved: '0',
             };
 
@@ -113,22 +100,9 @@ export function useGlide(): any {
         }
     };
 
-    // Validate session on mount and when it changes
-    useEffect(() => {
-        const validateSession = async () => {
-            if (session?.sessionId) {
-                const channel = await YellowService.getChannelInfo(session.sessionId);
-                if (!channel) {
-                    console.warn('[Glide] Session exists but channel not found. Clearing stale session.');
-                    handleLogout();
-                }
-            }
-        };
-        validateSession();
-    }, [session]);
-
     /**
-     * Send a gasless transaction during trial period
+     * Send a transaction (simulated for demo)
+     * In production: Would interact with actual contracts
      */
     const sendTransaction = async (
         tx: Omit<GlideTransaction, 'id' | 'timestamp' | 'status' | 'gasless'>
@@ -138,20 +112,13 @@ export function useGlide(): any {
         }
 
         try {
-            const walletClient = await getWalletClient();
+            // Simulate transaction processing
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
-            // Send transaction via Yellow (off-chain, user signs)
-            const result = await YellowService.sendTransaction(
-                walletClient,
-                session.walletAddress,
-                {
-                    sessionId: session.sessionId,
-                    ...tx,
-                }
-            );
+            const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
             const transaction: GlideTransaction = {
-                id: result.txId,
+                id: txId,
                 ...tx,
                 timestamp: new Date(),
                 status: 'completed',
@@ -171,14 +138,6 @@ export function useGlide(): any {
             return transaction;
         } catch (error: any) {
             console.error('Transaction failed:', error);
-
-            // Auto-recover from lost channels
-            if (error.message?.includes('Channel not found')) {
-                console.warn('[Glide] Channel lost during transaction. Resetting session.');
-                await handleLogout();
-                throw new Error('Session expired. Please log in again.');
-            }
-
             throw error;
         }
     };
@@ -193,13 +152,6 @@ export function useGlide(): any {
 
         try {
             const walletClient = await getWalletClient();
-
-            // Close Yellow session (User signs)
-            await YellowService.closeSession(
-                walletClient,
-                session.walletAddress,
-                session.sessionId
-            );
 
             // Settle on Arc
             const txHash = await ArcService.settleSession(
@@ -277,20 +229,16 @@ export function useGlide(): any {
             }
 
             // 3. Attempt Privy logout
-            // We catch errors here because if the session is already invalid on server (400),
-            // we still want the client to feel "logged out"
             await logout();
         } catch (error) {
             console.warn('[Glide] Privy logout error (handled):', error);
-            // Force a reload if logout fails to ensure clean state
-            // window.location.reload(); 
         }
     };
 
     return {
         // Privy auth
         login,
-        logout: handleLogout, // Export our wrapper instead of original
+        logout: handleLogout,
         user,
         authenticated,
         ready: privyReady,
