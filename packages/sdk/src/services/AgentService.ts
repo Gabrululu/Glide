@@ -1,4 +1,4 @@
-import { UniswapService, type UniswapPool } from './UniswapService';
+import { UniswapService, type UniswapV4Pool } from './UniswapService';
 
 /**
  * Agent Service - The "Brain" of Glide
@@ -21,7 +21,7 @@ export interface Strategy {
     id: string;
     name: string;
     description: string;
-    recommendedPool: UniswapPool;
+    recommendedPool: UniswapV4Pool;
     expectedReturn: string;
     riskLevel: 'low' | 'medium' | 'high';
     reasoning: string[];
@@ -78,7 +78,7 @@ export class AgentService {
      */
     private static generateStrategies(
         userProfile: UserProfile,
-        pools: UniswapPool[]
+        pools: UniswapV4Pool[]
     ): Strategy[] {
         const strategies: Strategy[] = [];
 
@@ -206,7 +206,7 @@ export class AgentService {
     /**
      * Calculate average APY across all pools
      */
-    private static calculateAverageAPY(pools: UniswapPool[]): string {
+    private static calculateAverageAPY(pools: UniswapV4Pool[]): string {
         const total = pools.reduce((sum, pool) => sum + parseFloat(pool.apy), 0);
         const avg = total / pools.length;
         return `${avg.toFixed(1)}%`;

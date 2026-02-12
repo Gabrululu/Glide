@@ -1,0 +1,20 @@
+{
+    "name": "glide-contracts",
+    "version": "1.0.0",
+    "description": "Smart contracts for Glide testnet",
+    "scripts": {
+        "compile": "hardhat compile",
+        "deploy:usdc": "hardhat run scripts/deploy-usdc.ts --network baseSepolia",
+        "deploy:session": "hardhat run scripts/deploy-session.ts --network baseSepolia",
+        "deploy:all": "npm run deploy:usdc && npm run deploy:session",
+        "verify:usdc": "hardhat verify --network baseSepolia",
+        "verify:session": "hardhat verify --network baseSepolia"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+        "@nomicfoundation/hardhat-verify": "^2.0.0",
+        "@openzeppelin/contracts": "^5.0.1",
+        "hardhat": "^2.19.4",
+        "dotenv": "^16.3.1"
+    }
+}
