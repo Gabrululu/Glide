@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title GlideSession
@@ -68,9 +68,16 @@ contract GlideSession is Ownable, ReentrancyGuard {
         uint256 trialDays,
         uint256 initialBalance
     ) external returns (bytes32) {
-        bytes32 sessionId = keccak256(
-            abi.encodePacked(user, block.timestamp, block.number)
-        );
+        bytes32 sessionId;
+        
+        // Use inline assembly for gas-efficient hashing
+        assembly {
+            let ptr := mload(0x40)
+            mstore(ptr, user)
+            mstore(add(ptr, 0x20), timestamp())
+            mstore(add(ptr, 0x40), number())
+            sessionId := keccak256(ptr, 0x60)
+        }
         
         require(sessions[sessionId].user == address(0), "Session already exists");
         

@@ -62,12 +62,22 @@ glide/
 npm install
 ```
 
-### 2. Setup Environment Variables
+### 2. Setup
+## 🌍 Environment Variables
 
-Copy `.env.example` to `.env.local` in `apps/demo/`:
+Create a `.env.local` file in `apps/demo`:
 
 ```bash
-cp .env.example apps/demo/.env.local
+# Privy (Authentication)
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+
+# Deployed Contracts (Base Sepolia)
+NEXT_PUBLIC_TRIAL_USDC=0xD0b7B9A370832f2480e7e5D8FBF7F76544a35F57
+NEXT_PUBLIC_SESSION_CONTRACT=0x4ff924499a78FFc2CC08658aA5c0D51181F549eB
+
+# Arc Network (Optional - for Real Settlement)
+NEXT_PUBLIC_ARC_RPC_URL=https://rpc.testnet.arc.network
+NEXT_PUBLIC_ARC_EXPLORER_URL=https://explorer.testnet.arc.network
 ```
 
 Add your API keys:

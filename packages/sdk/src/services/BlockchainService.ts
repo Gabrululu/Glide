@@ -4,6 +4,8 @@ import {
     CONTRACTS,
     ERC20_ABI,
     UNISWAP_V4_POOL_MANAGER_ABI,
+    TRIAL_USDC_ABI,
+    GLIDE_SESSION_ABI,
 } from '../contracts/addresses';
 
 /**
@@ -215,6 +217,82 @@ export class BlockchainService {
         } catch (error) {
             console.error('Transaction wait error:', error);
             return false;
+        }
+    }
+
+    /**
+     * Claim trial USDC funds
+     */
+    static async claimTrialFunds(
+        walletClient: WalletClient,
+        userAddress: Address
+    ): Promise<TransactionResult> {
+        try {
+            const hash = await walletClient.writeContract({
+                address: CONTRACTS.TRIAL_USDC as Address,
+                abi: TRIAL_USDC_ABI,
+                functionName: 'claimTrialFunds',
+                args: [],
+                account: userAddress,
+                chain: baseSepolia,
+            });
+
+            return {
+                success: true,
+                txHash: hash,
+            };
+        } catch (error: any) {
+            console.error('Claim funds error:', error);
+            return {
+                success: false,
+                error: error.message || 'Claim funds failed',
+            };
+        }
+    }
+
+    /**
+     * Create a new Glide session
+     */
+    static async createSession(
+        walletClient: WalletClient,
+        userAddress: Address,
+        trialDays: bigint = 7n,
+        initialBalance: bigint = 100000000n // 100 USDC
+    ): Promise<TransactionResult> {
+        try {
+            // First approve USDC spending
+            const approveHash = await walletClient.writeContract({
+                address: CONTRACTS.TRIAL_USDC as Address,
+                abi: ERC20_ABI,
+                functionName: 'approve',
+                args: [CONTRACTS.SESSION_CONTRACT as Address, initialBalance],
+                account: userAddress,
+                chain: baseSepolia,
+            });
+
+            // Wait for approval
+            await this.waitForTransaction(approveHash);
+
+            // Create session
+            const hash = await walletClient.writeContract({
+                address: CONTRACTS.SESSION_CONTRACT as Address,
+                abi: GLIDE_SESSION_ABI,
+                functionName: 'createSession',
+                args: [userAddress, trialDays, initialBalance],
+                account: userAddress,
+                chain: baseSepolia,
+            });
+
+            return {
+                success: true,
+                txHash: hash,
+            };
+        } catch (error: any) {
+            console.error('Create session error:', error);
+            return {
+                success: false,
+                error: error.message || 'Create session failed',
+            };
         }
     }
 }

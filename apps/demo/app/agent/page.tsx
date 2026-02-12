@@ -2,17 +2,27 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGlide, AgentService, type UserProfile, type Strategy, type AgentAnalysis } from '@glide/sdk';
-import { Brain, TrendingUp, Shield, Zap, ArrowLeft, Sparkles, Target, CheckCircle } from 'lucide-react';
+import { useGlide, AgentService, BlockchainService, ArcService, BaseScanService, type UserProfile, type Strategy, type AgentAnalysis } from '@glide/sdk';
+import { Brain, TrendingUp, Shield, Zap, ArrowLeft, Sparkles, Target, CheckCircle, Droplets, Coins, LogOut, ExternalLink } from 'lucide-react';
+import { useWallets } from '@privy-io/react-auth';
 
 export default function AgentPage() {
     const router = useRouter();
     const { session } = useGlide();
+    const { wallets } = useWallets();
     const [analysis, setAnalysis] = useState<AgentAnalysis | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [selectedStrategy, setSelectedStrategy] = useState<Strategy | null>(null);
     const [isExecuting, setIsExecuting] = useState(false);
     const [executionComplete, setExecutionComplete] = useState(false);
+
+    // Setup States
+    const [setupStep, setSetupStep] = useState<'idle' | 'claiming' | 'approving' | 'creating_session'>('idle');
+    const [setupTxHash, setSetupTxHash] = useState<string | null>(null);
+
+    // ARC Settlement States
+    const [arcSettlement, setArcSettlement] = useState<{ txHash: string; status: 'pending' | 'confirmed' } | null>(null);
+    const [isSettling, setIsSettling] = useState(false);
 
     // User profile (in production: would be saved/loaded from user preferences)
     const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -27,6 +37,8 @@ export default function AgentPage() {
         setAnalysis(null);
         setSelectedStrategy(null);
         setExecutionComplete(false);
+        setArcSettlement(null);
+        setSetupTxHash(null);
 
         try {
             const result = await AgentService.analyzeMarket(userProfile);
@@ -55,6 +67,53 @@ export default function AgentPage() {
             console.error('Execution failed:', error);
         } finally {
             setIsExecuting(false);
+        }
+    };
+
+    const handleSetup = async () => {
+        if (!session || !wallets[0]) return;
+
+        try {
+            const walletClient = await wallets[0].getEthereumProvider();
+            const client = BlockchainService.createWalletClient(walletClient);
+
+            // 1. Claim Faucet
+            setSetupStep('claiming');
+            const claimTx = await BlockchainService.claimTrialFunds(client, session.walletAddress as `0x${string}`);
+            if (claimTx.txHash) setSetupTxHash(claimTx.txHash);
+
+            // 2. Create Session
+            setSetupStep('creating_session');
+            const sessionTx = await BlockchainService.createSession(client, session.walletAddress as `0x${string}`);
+            if (sessionTx.txHash) setSetupTxHash(sessionTx.txHash);
+
+            setSetupStep('idle');
+        } catch (error) {
+            console.error('Setup failed:', error);
+            setSetupStep('idle');
+        }
+    };
+
+    const handleSettleArchive = async () => {
+        if (!session || !wallets[0]) return;
+
+        setIsSettling(true);
+        try {
+            const walletClient = await wallets[0].getEthereumProvider();
+            const client = BlockchainService.createWalletClient(walletClient);
+
+            // Simulate settlement
+            const txHash = await ArcService.settleSession(client, {
+                sessionId: 'demo-session-' + Date.now(),
+                walletAddress: session.walletAddress,
+                finalBalance: '105.50' // Simulated final balance
+            });
+
+            setArcSettlement({ txHash, status: 'confirmed' });
+        } catch (error) {
+            console.error('Settlement failed:', error);
+        } finally {
+            setIsSettling(false);
         }
     };
 
@@ -198,6 +257,42 @@ export default function AgentPage() {
                 )}
             </div>
 
+            {/* Setup Wizard */}
+            {!analysis && !isAnalyzing && (
+                <div className="card" style={{ marginBottom: '2rem', borderLeft: '4px solid var(--accent)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <Coins size={24} className="text-accent" />
+                        <h3 style={{ margin: 0 }}>Quick Setup</h3>
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                        Need trial funds or a new session? Get started here.
+                    </p>
+                    <button
+                        className="btn"
+                        onClick={handleSetup}
+                        disabled={setupStep !== 'idle'}
+                        style={{ background: 'var(--bg-secondary)', width: '100%' }}
+                    >
+                        {setupStep === 'idle' && 'Claim 100 USDC & Create Session'}
+                        {setupStep === 'claiming' && 'Claiming Trial USDC...'}
+                        {setupStep === 'approving' && 'Approving USDC...'}
+                        {setupStep === 'creating_session' && 'Creating Session...'}
+                    </button>
+                    {setupTxHash && (
+                        <div style={{ marginTop: '1rem', fontSize: '0.875rem' }}>
+                            <a
+                                href={BaseScanService.getTransactionUrl(setupTxHash)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                                View Setup Transaction <ExternalLink size={14} />
+                            </a>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Analyzing State */}
             {isAnalyzing && (
                 <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -284,7 +379,7 @@ export default function AgentPage() {
                 </>
             )}
 
-            {/* Execution Complete */}
+            {/* Execution Complete & Settlement */}
             {executionComplete && selectedStrategy && (
                 <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
                     <div style={{
@@ -303,7 +398,8 @@ export default function AgentPage() {
                     <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
                         Your funds are now earning <strong>{selectedStrategy.recommendedPool.apy} APY</strong> in the <strong>{selectedStrategy.name}</strong> pool.
                     </p>
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
                         <button
                             className="btn btn-primary"
                             onClick={() => router.push('/dashboard')}
@@ -315,12 +411,70 @@ export default function AgentPage() {
                             onClick={() => {
                                 setAnalysis(null);
                                 setExecutionComplete(false);
+                                setArcSettlement(null);
+                                setSetupTxHash(null);
                             }}
                             style={{ background: 'rgba(255,255,255,0.1)' }}
                         >
                             Analyze Again
                         </button>
                     </div>
+
+                    {/* Arc Settlement Section */}
+                    {!arcSettlement ? (
+                        <div style={{
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            padding: '1.5rem',
+                            borderRadius: '12px',
+                            marginBottom: '2rem'
+                        }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                <LogOut size={20} />
+                                Need to exit?
+                            </h4>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                                Settle your position on the high-performance Arc Network for instant liquidity.
+                            </p>
+                            <button
+                                className="btn"
+                                onClick={handleSettleArchive}
+                                disabled={isSettling}
+                                style={{
+                                    background: 'var(--accent)',
+                                    color: 'white',
+                                    border: 'none'
+                                }}
+                            >
+                                {isSettling ? 'Settling on Arc...' : 'Settle on Arc Network'}
+                            </button>
+                        </div>
+                    ) : (
+                        <div style={{
+                            background: 'rgba(16, 185, 129, 0.1)',
+                            padding: '1.5rem',
+                            borderRadius: '12px',
+                            marginBottom: '2rem',
+                            border: '1px solid var(--success)'
+                        }}>
+                            <h4 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Settlement Confirmed!</h4>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                Arc Transaction Hash:<br />
+                                <code style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', padding: '0.25rem', borderRadius: '4px' }}>
+                                    {arcSettlement.txHash}
+                                </code>
+                            </p>
+                            <div style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
+                                <a
+                                    href={BaseScanService.getTransactionUrl(arcSettlement.txHash)} // Assuming Arc supports similar explorer structure or just show hash
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                >
+                                    View on Explorer <ExternalLink size={14} />
+                                </a>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

@@ -1,5 +1,11 @@
-import { type WalletClient } from 'viem';
+import { type WalletClient, createPublicClient, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 import type { ENSProfile } from '../types';
+
+const publicClient = createPublicClient({
+    chain: baseSepolia,
+    transport: http('https://sepolia.base.org'),
+});
 
 /**
  * ENS integration service
@@ -14,12 +20,16 @@ export class ENSService {
      * Resolve ENS name to address
      */
     static async resolveName(name: string): Promise<string | null> {
-        // console.log('[ENS] Resolving name:', name);
-
-        // Generate consistent address from name (Simulated)
-        // In production: publicClient.getEnsAddress({ name })
-        const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return `0x${hash.toString(16).padStart(40, '0')}`;
+        try {
+            // Real resolution on Base Sepolia (Basenames)
+            const address = await publicClient.getEnsAddress({
+                name: name.endsWith('.base.eth') ? name : `${name}.base.eth`, // Default to .base.eth
+            });
+            return address;
+        } catch (error) {
+            console.error('ENS Resolution error:', error);
+            return null;
+        }
     }
 
     /**
@@ -27,12 +37,15 @@ export class ENSService {
      * Checks if user has already claimed a name
      */
     static async getGlideName(address: string): Promise<string> {
-        const profile = this.profiles.get(address);
-        if (profile) return profile.name;
-
-        // Create Default Name if not exists
-        const shortAddr = address.slice(2, 6);
-        return `user${shortAddr}.glide.eth`;
+        try {
+            // Real reverse resolution
+            const name = await publicClient.getEnsName({
+                address: address as `0x${string}`,
+            });
+            return name || `user-${address.slice(0, 6)}.base.eth`;
+        } catch (error) {
+            return `user-${address.slice(0, 6)}.base.eth`;
+        }
     }
 
     /**
