@@ -8,7 +8,7 @@ import { useWallets } from '@privy-io/react-auth';
 
 export default function AgentPage() {
     const router = useRouter();
-    const { session } = useGlide();
+    const { session, profile } = useGlide();
     const { wallets } = useWallets();
     const [analysis, setAnalysis] = useState<AgentAnalysis | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -165,8 +165,27 @@ export default function AgentPage() {
                     <Brain size={40} color="white" />
                 </div>
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
-                    Your Personal DeFi Agent
+                    {profile?.name ? `Welcome, ${profile.name}` : 'Your Personal DeFi Agent'}
                 </h2>
+
+                {/* ENS Persistence Tip */}
+                <div style={{
+                    background: 'rgba(59, 130, 246, 0.05)',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
+                    marginBottom: '1.5rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    maxWidth: '600px',
+                }}>
+                    <Sparkles size={16} color="#3b82f6" style={{ flexShrink: 0 }} />
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', textAlign: 'left' }}>
+                        <strong>Want this name for real?</strong> To make your identity and history persist across sessions, <a href="https://www.basenames.xyz/" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>register a Basename</a> on-chain.
+                    </p>
+                </div>
+
                 <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
                     Let the AI analyze Uniswap v4 pools and suggest the best yield strategy for your goals.
                     No complex terms, just simple choices.

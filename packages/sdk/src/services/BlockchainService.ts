@@ -295,4 +295,53 @@ export class BlockchainService {
             };
         }
     }
+    /**
+     * Get active session for user from blockchain
+     */
+    static async getActiveSession(userAddress: Address): Promise<any | null> {
+        try {
+            // 1. Get all user sessions
+            const sessionIds = await publicClient.readContract({
+                address: CONTRACTS.SESSION_CONTRACT as Address,
+                abi: GLIDE_SESSION_ABI,
+                functionName: 'getUserSessions',
+                args: [userAddress],
+            }) as `0x${string}`[];
+
+            if (!sessionIds || sessionIds.length === 0) return null;
+
+            // 2. Iterate backwards to find latest active session
+            for (let i = sessionIds.length - 1; i >= 0; i--) {
+                const sessionId = sessionIds[i];
+                const sessionData = await publicClient.readContract({
+                    address: CONTRACTS.SESSION_CONTRACT as Address,
+                    abi: GLIDE_SESSION_ABI,
+                    functionName: 'getSession',
+                    args: [sessionId],
+                }) as any;
+
+                // Struct: user, startTime, endTime, initialBalance, currentBalance, isActive, transactionCount, gasSaved
+                // Index: 0,    1,         2,       3,              4,              5,        6,                7
+
+                if (sessionData.isActive) {
+                    // Map to GlideSession
+                    return {
+                        userId: userAddress, // Use address as ID for now
+                        walletAddress: userAddress,
+                        sessionId: sessionId,
+                        trialStartDate: new Date(Number(sessionData.startTime) * 1000),
+                        trialEndDate: new Date(Number(sessionData.endTime) * 1000),
+                        isActive: true,
+                        balance: sessionData.currentBalance.toString(),
+                        gasSaved: sessionData.gasSaved.toString()
+                    };
+                }
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Failed to fetch active session:', error);
+            return null;
+        }
+    }
 }

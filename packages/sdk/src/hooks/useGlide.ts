@@ -19,10 +19,20 @@ export function useGlide(): any {
     useEffect(() => {
         if (user?.wallet?.address) {
             ENSService.getProfile(user.wallet.address).then(setProfile);
+
+            // Hydrate session from blockchain (Persistence)
+            const hydrateSession = async () => {
+                const activeSession = await import('../services/BlockchainService').then(m => m.BlockchainService.getActiveSession(user.wallet!.address as `0x${string}`));
+                if (activeSession) {
+                    setSession(activeSession);
+                }
+            };
+            hydrateSession();
         } else {
             setProfile(null);
+            setSession(null);
         }
-    }, [user?.wallet?.address]);
+    }, [user?.wallet?.address, setSession]);
 
     // Helper to get viem wallet client
     const getWalletClient = async () => {
