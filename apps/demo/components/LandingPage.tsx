@@ -3,7 +3,7 @@
 import React from 'react';
 import { useGlide } from '@glide/sdk';
 import { useRouter } from 'next/navigation';
-import { Zap, Shield, Clock } from 'lucide-react';
+import { Zap, Brain, Sparkles } from 'lucide-react';
 
 export default function LandingPage() {
     const { session, createSession, login, logout, authenticated, user, createWallet, wallets } = useGlide();
@@ -135,13 +135,13 @@ export default function LandingPage() {
 
             <main style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
                 <h2 style={{ fontSize: '3.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-                    DeFi Onboarding,{' '}
-                    <span className="gradient-text">Simplified</span>
+                    DeFi Made{' '}
+                    <span className="gradient-text">Intelligent</span>
                 </h2>
 
                 <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-                    Start trading in 2 minutes. No seed phrases, no gas fees for 7 days.
-                    Experience DeFi the way it should be.
+                    Let AI agents handle the complexity. You just choose your goal:
+                    "Earn passive income" or "Maximize growth".
                 </p>
 
 
@@ -178,17 +178,17 @@ export default function LandingPage() {
                     <FeatureCard
                         icon={<Zap size={32} />}
                         title="Instant Setup"
-                        description="Email login. Wallet created automatically. Start trading in seconds."
+                        description="Email login. Wallet created automatically. Start earning in seconds."
                     />
                     <FeatureCard
-                        icon={<Shield size={32} />}
-                        title="Gasless Trial"
-                        description="7 days of free transactions powered by Yellow Network state channels."
+                        icon={<Brain size={32} />}
+                        title="AI Agent"
+                        description="Agent scans Uniswap v4 pools and suggests optimal strategies in plain English."
                     />
                     <FeatureCard
-                        icon={<Clock size={32} />}
-                        title="Secure Settlement"
-                        description="All transactions settle on Arc blockchain with USDC."
+                        icon={<Sparkles size={32} />}
+                        title="No Jargon"
+                        description="Forget APY, IL, and ticks. Just tell the agent your goal and let it work."
                     />
                 </div>
 
@@ -196,10 +196,10 @@ export default function LandingPage() {
                     <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>The Problem</h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
                         <strong style={{ color: 'var(--warning)' }}>50%+ of users</strong> drop off during
-                        traditional DeFi onboarding due to complex wallet setup and gas fees.
+                        traditional DeFi onboarding due to overwhelming complexity and confusing terminology.
                     </p>
                     <p style={{ color: 'var(--success)', fontSize: '1.1rem', marginTop: '1rem' }}>
-                        GLIDE reduces drop-off to <strong>25%</strong> with instant, gasless onboarding.
+                        GLIDE reduces drop-off to <strong>25%</strong> with AI agents that speak your language.
                     </p>
                 </div>
             </main>

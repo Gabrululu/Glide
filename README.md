@@ -1,31 +1,32 @@
-# GLIDE - OnboardKit for DeFi
+# GLIDE - Agentic Finance for DeFi
 
-🚀 **Reduce onboarding drop-off from 50% to 25%** with instant, gasless DeFi onboarding powered by Yellow Network, Arc, and Privy.
+🤖 **Reduce onboarding drop-off from 50% to 25%** with AI agents that simplify DeFi complexity, powered by Uniswap v4, Arc, and Privy.
 
 ## 🎯 What is GLIDE?
 
-GLIDE is a plug-and-play SDK that DeFi protocols can integrate in 5 minutes to dramatically improve user onboarding:
+GLIDE is an agentic finance platform that uses AI to make DeFi accessible to everyone:
 
 - **No seed phrases**: Email/social login via Privy embedded wallets
-- **7-day gasless trial**: Powered by Yellow Network state channels
-- **Secure settlement**: Final balance settles on Arc blockchain with USDC
+- **AI-powered strategies**: Agents analyze markets and suggest optimal yield strategies
+- **Plain English**: No confusing terms like "impermanent loss" or "liquidity pools"
+- **Uniswap v4 integration**: Access to cutting-edge DeFi infrastructure with Hooks
 - **ENS integration**: Human-readable names for users and protocols
 
 ## 📊 The Problem
 
 - **50%+ drop-off** during traditional DeFi onboarding
-- Users spend **hours** setting up wallets, buying crypto, and bridging
-- Complex seed phrases scare away new users
-- Gas fees create friction before users even try the product
+- Users are **overwhelmed** by complex terminology (APY, TVL, IL, pools, ticks)
+- Understanding yield strategies requires deep DeFi knowledge
+- No guidance on which protocols or strategies to use
 
 ## ✨ The Solution
 
-GLIDE provides a **2-minute onboarding flow**:
+GLIDE provides an **AI agent that does the thinking for you**:
 
 1. User enters email → wallet created automatically
-2. Receives 0.1 USDC trial balance
-3. Makes swaps, stakes, trades **gasless** for 7 days
-4. Converts to paid user after experiencing the product
+2. Agent scans Uniswap v4 pools and analyzes market conditions
+3. Agent suggests strategies in plain English: "Low Risk Income" or "Growth Strategy"
+4. User clicks "Deploy" → Agent executes optimal positions automatically
 
 ## 🏗️ Project Structure
 
@@ -124,20 +125,21 @@ function OnboardButton() {
 
 This project qualifies for:
 
-### Yellow Network 
-- ✅ Integrates Yellow SDK for state channels
-- ✅ Demonstrates gasless transactions
-- ✅ Shows session-based spending
+### Uniswap v4 - Agentic Finance ($5,000)
+- ✅ Agent-driven financial systems on Uniswap v4
+- ✅ Programmatic pool interaction and liquidity management
+- ✅ Transparent, reliable agent behavior
+- ✅ Composable onchain state management
 
 ### Arc 
 - ✅ Uses Arc for USDC settlement
 - ✅ Chain abstraction for liquidity
-- ✅ Global payout system (trial funding)
+- ✅ Global payout system
 
 ### ENS 
 - ✅ Creative use: user.glide.eth naming
 - ✅ Protocol reputation via ENS
-- ✅ Text records for preferences
+- ✅ Text records for user preferences
 
 ## 💰 Business Model
 
@@ -154,7 +156,8 @@ This project qualifies for:
 
 - **Frontend**: Next.js 15 + React 18 + TypeScript
 - **Wallet**: Privy embedded wallets
-- **State Channels**: Yellow Network Nitrolite
+- **DeFi Layer**: Uniswap v4 (Pools + Hooks)
+- **Agent Logic**: TypeScript-based decision engine
 - **Settlement**: Arc blockchain
 - **Naming**: ENS
 - **Monorepo**: Turborepo
